@@ -1,0 +1,115 @@
+{
+  "methodology": {
+    "notebook_source": "22_cross_validation_analysis.ipynb (Section 9: Events-Only CV)",
+    "approach": "Confidence-threshold classification (tau=0.4); articles below threshold labeled No Event",
+    "description": "Articles with max category score < 0.4 excluded/labeled No Event; remaining articles classified into 7 categories"
+  },
+  "parameters": {
+    "k_keywords": 6,
+    "k_sentences": 2,
+    "ambiguity_delta": 0.01,
+    "threshold": 0.4,
+    "model": "BAAI/bge-m3"
+  },
+  "tier_hierarchy": {
+    "tier_1": [
+      "Governance",
+      "Personnel"
+    ],
+    "tier_2": [
+      "Products",
+      "IT/Data",
+      "Processes"
+    ],
+    "tier_3": [
+      "Communication",
+      "Legal"
+    ]
+  },
+  "full_dataset": {
+    "total_articles_scored": 19556,
+    "no_event_filtered": 628,
+    "no_event_filtered_pct": 3.2112906524851708,
+    "total_articles": 18928,
+    "ambiguous_cases": 7668,
+    "ambiguous_percentage": 40.51141166525782,
+    "clear_cases": 11260,
+    "category_distribution": {
+      "Communication": 4175,
+      "Governance": 5186,
+      "IT/Data": 2385,
+      "Legal": 1796,
+      "Personnel": 1997,
+      "Processes": 1217,
+      "Products": 2172
+    }
+  },
+  "validation_subset": {
+    "total_articles": 323,
+    "accuracy": 0.14551083591331268,
+    "f1_macro": 0.15262216671915546,
+    "f1_weighted": 0.13824232450092097,
+    "precision_macro": 0.21904082694138036,
+    "precision_weighted": 0.8474778933288182,
+    "recall_macro": 0.4630400263967905,
+    "recall_weighted": 0.14551083591331268
+  },
+  "ambiguity_analysis": {
+    "total_ambiguous_pairs": 15512,
+    "unique_pairs": 21,
+    "top_5_pairs": [
+      {
+        "pair": [
+          "Communication",
+          "Governance"
+        ],
+        "count": 1985
+      },
+      {
+        "pair": [
+          "Communication",
+          "IT/Data"
+        ],
+        "count": 1150
+      },
+      {
+        "pair": [
+          "Communication",
+          "Personnel"
+        ],
+        "count": 1127
+      },
+      {
+        "pair": [
+          "Communication",
+          "Products"
+        ],
+        "count": 1025
+      },
+      {
+        "pair": [
+          "Communication",
+          "Legal"
+        ],
+        "count": 997
+      }
+    ],
+    "score_delta_stats": {
+      "ambiguous_mean": 0.004694781333682247,
+      "ambiguous_median": 0.004537866761287035,
+      "clear_mean": 0.026841004521907467,
+      "clear_median": 0.022213400652011245
+    }
+  },
+  "output_files": {
+    "full_dataset": "full_dataset_labeled.parquet",
+    "ambiguous_cases": "ambiguous_cases.parquet",
+    "validation_subset": "validation_subset_results.parquet",
+    "visualizations": [
+      "category_distribution.png",
+      "confusion_matrix.png",
+      "ambiguity_cooccurrence_heatmap.png",
+      "score_delta_distribution.png"
+    ]
+  }
+}
