@@ -26,3 +26,12 @@ def overview():
 def crosstab():
     df = store.crosstab
     return df.astype(object).where(df.notna(), None).to_dict(orient="records")
+
+
+@router.get("/crosstab/drilldown")
+def crosstab_drilldown(category: str, emotion: str):
+    df = store.peaks_by_category_emotion(category, emotion)
+    records = df.astype(object).where(df.notna(), None).to_dict(orient="records")
+    for row in records:
+        row["start_date"] = row["start_date"].isoformat()
+    return records

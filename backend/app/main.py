@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import companies, peaks, stats
+from app.routers import articles, companies, peaks, stats
 
 app = FastAPI(title="Reputational Risk Dashboard API")
 
@@ -19,6 +19,7 @@ app.add_middleware(
 app.include_router(stats.router, prefix="/stats", tags=["stats"])
 app.include_router(companies.router, prefix="/companies", tags=["companies"])
 app.include_router(peaks.router, prefix="/peaks", tags=["peaks"])
+app.include_router(articles.router, prefix="/articles", tags=["articles"])
 
 
 @app.get("/")

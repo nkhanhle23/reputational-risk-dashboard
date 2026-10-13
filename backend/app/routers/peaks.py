@@ -25,4 +25,6 @@ def peak_detail(peak_id: str):
     else:
         peak["event_study"] = None
 
+    peak["company_id"] = store.company_id_for(peak["ticker"], peak["company_name"])
+
     return peak

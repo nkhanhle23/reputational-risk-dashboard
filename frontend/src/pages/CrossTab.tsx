@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { api, type CrosstabRow } from '../api'
 
 export default function CrossTab() {
   const [rows, setRows] = useState<CrosstabRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     api.crosstab().then(setRows).catch((e) => setError(String(e)))
@@ -38,7 +40,15 @@ export default function CrossTab() {
           </thead>
           <tbody>
             {sorted.map((row, i) => (
-              <tr key={i}>
+              <tr
+                key={i}
+                className="clickable"
+                onClick={() =>
+                  navigate(
+                    `/crosstab/drilldown?category=${encodeURIComponent(row.Category)}&emotion=${encodeURIComponent(row.Emotion)}`,
+                  )
+                }
+              >
                 <td>{row.Category}</td>
                 <td>{row.Emotion}</td>
                 <td>{row.n}</td>

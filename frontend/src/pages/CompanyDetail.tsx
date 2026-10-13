@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ScatterChart,
   Scatter,
@@ -23,6 +23,7 @@ export default function CompanyDetail() {
   const { companyId } = useParams<{ companyId: string }>()
   const [data, setData] = useState<CompanyDetailData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!companyId) return
@@ -62,7 +63,7 @@ export default function CompanyDetail() {
 
       <div className="card">
         <h2>Emotion peak timeline</h2>
-        <p>Each point is a detected reputational-crisis episode. Height = max emotion z-score.</p>
+        <p>Each point is a detected reputational-crisis episode. Height = max emotion z-score. Click a point for details.</p>
         <ResponsiveContainer width="100%" height={300}>
           <ScatterChart margin={{ top: 10, right: 20, bottom: 10, left: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#2a3142" />
@@ -101,6 +102,10 @@ export default function CompanyDetail() {
             <Scatter
               data={chartData}
               fill="#8ab4ff"
+              cursor="pointer"
+              onClick={(point: { payload?: { peak_id?: string } }) => {
+                if (point.payload?.peak_id) navigate(`/peaks/${point.payload.peak_id}`)
+              }}
               shape={(props: { cx?: number; cy?: number; payload?: { emotion: string } }) => {
                 const { cx, cy, payload } = props
                 const color = EMOTION_COLORS[payload?.emotion ?? ''] ?? '#8ab4ff'
@@ -126,7 +131,7 @@ export default function CompanyDetail() {
           </thead>
           <tbody>
             {peaks.map((p) => (
-              <tr key={p.peak_id}>
+              <tr key={p.peak_id} className="clickable" onClick={() => navigate(`/peaks/${p.peak_id}`)}>
                 <td>{new Date(p.start_date).toLocaleDateString()}</td>
                 <td>{p.duration_days}d</td>
                 <td>{p.dominant_emotion}</td>

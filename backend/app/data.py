@@ -53,6 +53,12 @@ class Store:
         rows = self.companies[self.companies["company_id"] == company_id]
         return rows.iloc[0] if len(rows) else None
 
+    def company_id_for(self, ticker: str, company_name: str) -> str | None:
+        rows = self.companies[
+            (self.companies["ticker"] == ticker) & (self.companies["company_name"] == company_name)
+        ]
+        return rows.iloc[0]["company_id"] if len(rows) else None
+
     def company_articles(self, ticker: str, company_name: str) -> pd.DataFrame:
         mask = (self.matches["ticker"] == ticker) & (self.matches["company_name"] == company_name)
         article_ids = self.matches.loc[mask, "article_id"].dropna().unique()
@@ -68,6 +74,34 @@ class Store:
     def peak_event_study(self, peak_id: str) -> pd.Series | None:
         rows = self.event_study[self.event_study["peak_id"] == peak_id]
         return rows.iloc[0] if len(rows) else None
+
+    def peaks_by_category_emotion(self, category: str, emotion: str) -> pd.DataFrame:
+        mask = (self.peaks["primary_category"] == category) & (
+            self.peaks["dominant_emotion"] == emotion
+        )
+        matching = self.peaks.loc[
+            mask, ["peak_id", "ticker", "company_name", "start_date", "dominant_emotion", "primary_category"]
+        ]
+        merged = matching.merge(self.event_study[["peak_id", "car"]], on="peak_id", how="inner")
+        merged["company_id"] = merged["ticker"] + "__" + merged["company_name"].str.replace(
+            r"[^A-Za-z0-9]+", "-", regex=True
+        )
+        return merged.sort_values("start_date")
+
+    def articles_by_category(
+        self, category: str | None, limit: int, offset: int
+    ) -> tuple[pd.DataFrame, int]:
+        merged = self.articles.merge(
+            self.labeled[["article_id", "predicted_category", "is_ambiguous", "top_score"]],
+            on="article_id",
+            how="left",
+        )
+        if category is not None:
+            merged = merged[merged["predicted_category"] == category]
+        merged = merged.sort_values("published_date", ascending=False)
+        total = len(merged)
+        page = merged.iloc[offset : offset + limit]
+        return page, total
 
 
 store = Store()

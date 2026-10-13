@@ -64,6 +64,18 @@ export interface CategoryEvolutionPoint {
 
 export interface PeakDetail extends Peak {
   category_evolution: CategoryEvolutionPoint[]
+  company_id: string | null
+}
+
+export interface PeakSummary {
+  peak_id: string
+  ticker: string
+  company_name: string
+  company_id: string
+  start_date: string
+  dominant_emotion: string
+  primary_category: string
+  car: number
 }
 
 export interface Article {
@@ -82,6 +94,11 @@ export interface CompanyDetail {
   company: Company
   peaks: Peak[]
   articles: Article[]
+}
+
+export interface ArticleListResponse {
+  items: Article[]
+  total: number
 }
 
 export interface CrosstabRow {
@@ -136,7 +153,16 @@ async function getJSON<T>(path: string): Promise<T> {
 export const api = {
   overview: () => getJSON<Overview>('/stats/overview'),
   crosstab: () => getJSON<CrosstabRow[]>('/stats/crosstab'),
+  crosstabDrilldown: (category: string, emotion: string) =>
+    getJSON<PeakSummary[]>(
+      `/stats/crosstab/drilldown?category=${encodeURIComponent(category)}&emotion=${encodeURIComponent(emotion)}`,
+    ),
   companies: () => getJSON<Company[]>('/companies'),
   companyDetail: (companyId: string) => getJSON<CompanyDetail>(`/companies/${companyId}`),
   peakDetail: (peakId: string) => getJSON<PeakDetail>(`/peaks/${peakId}`),
+  articles: (category: string | null, limit: number, offset: number) => {
+    const params = new URLSearchParams({ limit: String(limit), offset: String(offset) })
+    if (category) params.set('category', category)
+    return getJSON<ArticleListResponse>(`/articles?${params.toString()}`)
+  },
 }

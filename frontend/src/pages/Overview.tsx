@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { api, type Overview as OverviewData } from '../api'
 
 export default function Overview() {
   const [data, setData] = useState<OverviewData | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const navigate = useNavigate()
 
   useEffect(() => {
     api.overview().then(setData).catch((e) => setError(String(e)))
@@ -50,13 +52,23 @@ export default function Overview() {
 
       <div className="card">
         <h2>Category distribution</h2>
+        <p>Click a bar to see the articles in that category.</p>
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={categoryData}>
             <CartesianGrid strokeDasharray="3 3" stroke="#2a3142" />
             <XAxis dataKey="category" stroke="#9aa5b8" />
             <YAxis stroke="#9aa5b8" />
             <Tooltip contentStyle={{ background: '#1a1f2b', border: '1px solid #2a3142' }} />
-            <Bar dataKey="count" fill="#8ab4ff" />
+            <Bar
+              dataKey="count"
+              fill="#8ab4ff"
+              cursor="pointer"
+              onClick={(entry: { payload?: { category: string } }) => {
+                if (entry.payload) {
+                  navigate(`/articles?category=${encodeURIComponent(entry.payload.category)}`)
+                }
+              }}
+            />
           </BarChart>
         </ResponsiveContainer>
         <p>
